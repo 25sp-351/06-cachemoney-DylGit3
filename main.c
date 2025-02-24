@@ -6,13 +6,36 @@
 #include "money_to_string.h"
 
 int main() {
-    LoadFunction load_the_cache     = cache_load;
-    LookupFunction search_for_value = cache_lookup;
-    InsertFunction insert_a_value   = cache_insert;
+    cache_load();
 
-    load_the_cache();
+    ProviderFunction provider = convert_to_words;
+    provider                  = set_provider(convert_to_words);
 
-    money_to_string();
+    char buffer_line[MAX_LINE_LENGTH];
+
+    FILE *output_file = fopen("output.txt", "w");
+    if (!output_file) {
+        fprintf(stderr, "Error opening output file.\n");
+        exit(1);
+    }
+
+    while (fgets(buffer_line, sizeof(buffer_line), stdin)) {
+        long long money = -1;
+
+        if (sscanf(buffer_line, "%llu", &money) == 1) {
+            int dollar_check = money / 100;
+            if (dollar_check >= 0 && dollar_check <= MAX_MONEY_INTAKE) {
+                char *dollars_text = (*provider)(money);
+
+                fprintf(output_file, "%llu = %s\n", money, dollars_text);
+                printf("%llu = %s\n", money, dollars_text);
+            }
+        }
+    }
+
+    fclose(output_file);
+
+    cache_clear();
 
     return 0;
 }

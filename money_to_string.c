@@ -20,122 +20,88 @@ char *helper(long long num) {
     memset(result, 0, sizeof(result));
 
     if (num >= 100) {
-        strcat(result, single_digits[num / 100]);
-        strcat(result, " hundred ");
+        strncat(result, single_digits[num / 100],
+                MAX_LINE_LENGTH - strlen(result) - 1);
+        strncat(result, " hundred ", MAX_LINE_LENGTH - strlen(result) - 1);
         num %= 100;
     }
 
     if (num >= 10 && num < 20) {
-        strcat(result, teen_digits[num - 10]);
+        strncat(result, teen_digits[num - 10],
+                MAX_LINE_LENGTH - strlen(result) - 1);
     } else if (num >= 20) {
-        strcat(result, tens_digits[num / 10]);
+        strncat(result, tens_digits[num / 10],
+                MAX_LINE_LENGTH - strlen(result) - 1);
         if (num % 10 != 0) {
-            strcat(result, "-");
-            strcat(result, single_digits[num % 10]);
+            strncat(result, "-", MAX_LINE_LENGTH - strlen(result) - 1);
+            strncat(result, single_digits[num % 10],
+                    MAX_LINE_LENGTH - strlen(result) - 1);
         }
     } else if (num > 0) {
-        strcat(result, single_digits[num]);
+        strncat(result, single_digits[num],
+                MAX_LINE_LENGTH - strlen(result) - 1);
     }
 
     return result;
 }
 
+// This returns an allocated string, caller must free it
 char *convert_to_words(long long money) {
-    // if (money < MEMOIZED_ARRAY && cache[money]) {
-    //     return cache[money];
-    // }
-
     int dollars         = money / 100;
     int remaining_cents = money % 100;
-    static char result[MAX_LINE_LENGTH];
+    char *result        = malloc(MAX_LINE_LENGTH);
+    if (result == NULL)
+        return NULL;
     result[0] = '\0';
 
     if (dollars >= 1000000000) {
-        strcat(result, helper(dollars / 1000000000));
-        strcat(result, " ");
-        strcat(result, thousands[3]);
-        strcat(result, " ");
+        strncat(result, helper(dollars / 1000000000),
+                MAX_LINE_LENGTH - strlen(result) - 1);
+        strncat(result, " ", MAX_LINE_LENGTH - strlen(result) - 1);
+        strncat(result, thousands[3], MAX_LINE_LENGTH - strlen(result) - 1);
+        strncat(result, " ", MAX_LINE_LENGTH - strlen(result) - 1);
         dollars %= 1000000000;
     }
 
     if (dollars >= 1000000) {
-        strcat(result, helper(dollars / 1000000));
-        strcat(result, " ");
-        strcat(result, thousands[2]);
-        strcat(result, " ");
+        strncat(result, helper(dollars / 1000000),
+                MAX_LINE_LENGTH - strlen(result) - 1);
+        strncat(result, " ", MAX_LINE_LENGTH - strlen(result) - 1);
+        strncat(result, thousands[2], MAX_LINE_LENGTH - strlen(result) - 1);
+        strncat(result, " ", MAX_LINE_LENGTH - strlen(result) - 1);
         dollars %= 1000000;
     }
 
     if (dollars >= 1000) {
-        strcat(result, helper(dollars / 1000));
-        strcat(result, " ");
-        strcat(result, thousands[1]);
-        strcat(result, " ");
+        strncat(result, helper(dollars / 1000),
+                MAX_LINE_LENGTH - strlen(result) - 1);
+        strncat(result, " ", MAX_LINE_LENGTH - strlen(result) - 1);
+        strncat(result, thousands[1], MAX_LINE_LENGTH - strlen(result) - 1);
+        strncat(result, " ", MAX_LINE_LENGTH - strlen(result) - 1);
         dollars %= 1000;
     }
 
     if (dollars > 0) {
-        strcat(result, helper(dollars));
+        strncat(result, helper(dollars), MAX_LINE_LENGTH - strlen(result) - 1);
     }
 
     if (dollars == 1) {
-        strcat(result, " dollar and ");
+        strncat(result, " dollar and ", MAX_LINE_LENGTH - strlen(result) - 1);
     } else if (dollars > 1) {
-        strcat(result, " dollars and ");
+        strncat(result, " dollars and ", MAX_LINE_LENGTH - strlen(result) - 1);
     }
 
     if (remaining_cents == 0) {
-        strcat(result, "zero cents");
+        strncat(result, "zero cents", MAX_LINE_LENGTH - strlen(result) - 1);
     } else {
-        strcat(result, helper(remaining_cents));
+        strncat(result, helper(remaining_cents),
+                MAX_LINE_LENGTH - strlen(result) - 1);
         if (remaining_cents == 1) {
-            strcat(result, " cent");
+            strncat(result, " cent", MAX_LINE_LENGTH - strlen(result) - 1);
         } else {
-            strcat(result, " cents");
+            strncat(result, " cents", MAX_LINE_LENGTH - strlen(result) - 1);
         }
     }
-
-    // if (money < MEMOIZED_ARRAY) {
-    //     cache[money] = strdup(result);
-    // }
 
     return result;
-}
-
-void money_to_string() {
-    char buffer_line[MAX_LINE_LENGTH];
-    // char **cache = load_cache();
-
-    FILE *output_file = fopen("output.txt", "w");
-    // FILE *cache_file  = fopen(MEMOIZED_FILE, "a");
-    if (!output_file) {
-        fprintf(stderr, "Error opening output file.\n");
-        return;
-    }
-    // if (!cache_file) {
-    //     fprintf(stderr, "Error opening cache file.\n");
-    //     fclose(output_file);
-    //     return;
-    // }
-
-    while (fgets(buffer_line, sizeof(buffer_line), stdin)) {
-        long long money = -1;
-
-        if (sscanf(buffer_line, "%llu", &money) == 1) {
-            int dollar_check = money / 100;
-            if (dollar_check >= 0 && dollar_check <= MAX_MONEY_INTAKE) {
-                char *dollars_text = convert_to_words(money);
-
-                fprintf(output_file, "%llu = %s\n", money, dollars_text);
-                printf("%llu = %s\n", money, dollars_text);
-
-                // if (money >= 0 && money <= 150000 && cache[money] == NULL) {
-                //     fprintf(cache_file, "%llu = %s\n", money, dollars_text);
-                // }
-            }
-        }
-    }
-
-    fclose(output_file);
-    // fclose(cache_file);
 }

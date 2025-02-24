@@ -5,4 +5,3 @@
 111111111 = one million one hundred eleven thousand one hundred eleven dollars and eleven cents
 100000000000 = one billion zero cents
 15 = fifteen cents
-16 = sixteen cents

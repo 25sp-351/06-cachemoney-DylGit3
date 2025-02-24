@@ -6,6 +6,8 @@
 #define CACHE_SIZE 100
 #define UNDEFINED_KEY -1
 #define UNDEFINED_VALUE NULL
+#define CACHE_FILE "cachefile.txt"
+#define BUFFER 256
 
 typedef long long KeyType;
 
@@ -16,14 +18,15 @@ typedef struct CacheEntry {
     ValueType value;
 } CacheEntry;
 
-typedef void (*LoadFunction)(void);
-typedef ValueType (*LookupFunction)(KeyType lookup_key);
-typedef void (*InsertFunction)(KeyType insert_key, ValueType insert_value);
+typedef ValueType (*ProviderFunction)(KeyType key);
 
-char* cache_lookup(KeyType lookup_key);
+ProviderFunction set_provider(ProviderFunction downstream_provider);
+ValueType cache_lookup(KeyType lookup_key);
 void cache_insert(KeyType insert_key, ValueType insert_value);
 void cache_load(void);
 void cache_free_end(void);
+void cache_clear(void);
+KeyType cache_return();
 
 #endif
 
